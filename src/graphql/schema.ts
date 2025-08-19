@@ -1,8 +1,29 @@
 import { buildSchema } from "graphql";
 
 export const schema = buildSchema(`
+type GetProducts{
+   id:String
+    name: String
+    moreinfo: String
+    mainimg: String
+    newprice: Int
+    oldprice: Int
+    slideimg: String
+    type: String 
+    offer:Boolean 
+}
+type GetProductsResponse{
+ products:[GetProducts],
+ length:Int
+}
+ input TypeInput{
+ type:String
+ activepage:Int
+ }  
+
   type RootQuery {
-    hello: String
+    hello: String,
+    getproducts(input: TypeInput):GetProductsResponse
   }
 
   input ProductInput {

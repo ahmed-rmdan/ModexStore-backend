@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-const prisma =new PrismaClient()
+export const prisma =new PrismaClient()
 type ProductInput = {
   name: string;
   moreinfo: string;
@@ -17,12 +17,13 @@ type ProductInput = {
 
 export const resolver={
     hello:()=>'hello',
+
 addproduct: async ({ input }: { input: ProductInput }) => {
   let offer = false;
   if (input.oldprice !== input.newprice) {
     offer = true;
   }
-
+console.log(input.oldprice !== input.newprice)
   const data = {
     name: input.name,
     type: input.type,
@@ -31,7 +32,7 @@ addproduct: async ({ input }: { input: ProductInput }) => {
     newprice: input.newprice,
     oldprice: input.oldprice,
     slideimg: input.sliderimge,
-    offer,
+    offer:offer
   };
 
   console.log("Data to insert:", data);
@@ -43,6 +44,25 @@ try {
   console.error("Prisma Error:", err);
   throw err;
 }
+},
+getproducts:async ({input}:{input:{type:string,activepage:number}})=>{
+  console.log(input.type)
+if (input.type==='allproducts'){
+  const data= await prisma.product.findMany({skip:(input.activepage-1)*4,take:4})
+  const length=(await prisma.product.findMany()).length
+  return {products:data,length }
+
+}if(input.type==='offers'){
+   const data= await prisma.product.findMany({where:{offer:true},skip:(input.activepage-1)*4,take:4})
+    const length=(await prisma.product.findMany({where:{offer:true}})).length
+  return {products:data,length}
+}
+else{
+  const data= await prisma.product.findMany({where:{type:input.type},skip:(input.activepage-1)*4,take:4})
+  const length= (await prisma.product.findMany({where:{type:input.type}})).length
+  return {products:data,length}
+}
+
 }
 
 
