@@ -6,10 +6,22 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+ 
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model product {
+  id       String  @id @default(uuid())
+  name     String
+  type     String
+  oldprice Int
+  newprice Int
+  offer    Boolean @default(false)
+  moreinfo String
+  mainimg  String
+  slideimg String
 }
