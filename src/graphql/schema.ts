@@ -21,9 +21,13 @@ type GetProductsResponse{
  activepage:Int
  }  
 
+type GetOffersResponse{
+ products:[GetProducts]
+}
   type RootQuery {
     hello: String,
-    getproducts(input: TypeInput):GetProductsResponse
+    getproducts(input: TypeInput):GetProductsResponse ,
+    getalloffers:GetOffersResponse
   }
 
   input ProductInput {
@@ -42,7 +46,7 @@ type GetProductsResponse{
   }
 
   type RootMutation {
-    addproduct(input: ProductInput): AddProductResponse
+    addproduct(input: ProductInput): AddProductResponse 
   }
 
   schema {

@@ -63,6 +63,10 @@ else{
   return {products:data,length}
 }
 
+},
+getalloffers:async ()=>{
+const data= await prisma.product.findMany({where:{offer:true}})
+return {products:data}
 }
 
 
