@@ -52,9 +52,17 @@ input GetProductInput{
     message: String ,
      id:String
   }
+   input DeleteProductInput{
+     id:String
+   } 
 
+    type DeleteProductResponse{
+      message: String
+    }  
+    
   type RootMutation {
-    addproduct(input: ProductInput): AddProductResponse 
+    addproduct(input: ProductInput): AddProductResponse,
+     deleteproduct(input:DeleteProductInput) : DeleteProductResponse
   }
 
   schema {

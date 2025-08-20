@@ -73,7 +73,14 @@ getproduct:async ({input}:{input:{id:string}})=>{
           const product=await prisma.product.findUnique({where:{id:input.id}})
           console.log(product)
           return {product};
-}
+},
+deleteproduct:async ({input}:{input:{id:string}})=>{
+           console.log(input.id)
+          await prisma.product.delete({where:{id:input.id}})
+          
+          return {message:'product has been deleted'};
+},
+
 
 
 
