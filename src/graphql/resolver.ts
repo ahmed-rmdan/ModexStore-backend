@@ -67,6 +67,12 @@ else{
 getalloffers:async ()=>{
 const data= await prisma.product.findMany({where:{offer:true}})
 return {products:data}
+},
+getproduct:async ({input}:{input:{id:string}})=>{
+           console.log(input.id)
+          const product=await prisma.product.findUnique({where:{id:input.id}})
+          console.log(product)
+          return {product};
 }
 
 

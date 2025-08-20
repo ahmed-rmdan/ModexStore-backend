@@ -25,7 +25,7 @@ const storge=multer.diskStorage({
   destination(req, file, callback) {
     callback(null,'upload/')
   },
-  filename(req, file, callback) {
+  filename(req, file, callback) { 
     callback(null,Date.now()+'-'+file.originalname)
   },
 })

@@ -24,10 +24,18 @@ type GetProductsResponse{
 type GetOffersResponse{
  products:[GetProducts]
 }
+ type GetProductResponse{
+ product:GetProducts
+}
+input GetProductInput{
+ id:String!
+}
+
   type RootQuery {
     hello: String,
     getproducts(input: TypeInput):GetProductsResponse ,
-    getalloffers:GetOffersResponse
+    getalloffers:GetOffersResponse,
+    getproduct(input:GetProductInput):GetProductResponse
   }
 
   input ProductInput {
