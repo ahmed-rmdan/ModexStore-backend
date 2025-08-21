@@ -32,7 +32,6 @@ input GetProductInput{
 }
 
   type RootQuery {
-    hello: String,
     getproducts(input: TypeInput):GetProductsResponse ,
     getalloffers:GetOffersResponse,
     getproduct(input:GetProductInput):GetProductResponse
@@ -47,6 +46,17 @@ input GetProductInput{
     sliderimge: String
     type: String  
   }
+  input EditProductInput{
+      id:String
+     name: String
+    moreinfo: String
+    mainimge: String
+    newprice: Int
+    oldprice: Int
+    sliderimge: String
+    type: String 
+  
+  }
 
   type AddProductResponse { 
     message: String ,
@@ -59,10 +69,16 @@ input GetProductInput{
     type DeleteProductResponse{
       message: String
     }  
+     type EditPropductResponse{
+      message: String,
+      id:String
+    }  
+ 
     
   type RootMutation {
     addproduct(input: ProductInput): AddProductResponse,
-     deleteproduct(input:DeleteProductInput) : DeleteProductResponse
+     deleteproduct(input:DeleteProductInput) : DeleteProductResponse,
+     editproduct(input:EditProductInput) : EditPropductResponse
   }
 
   schema {
