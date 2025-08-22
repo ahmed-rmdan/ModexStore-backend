@@ -25,3 +25,13 @@ model product {
   mainimg  String
   slideimg String
 }
+
+model user{
+  id       String  @id @default(uuid())
+  name     String
+  username String
+  password String
+  email    String
+  telphone String
+
+}

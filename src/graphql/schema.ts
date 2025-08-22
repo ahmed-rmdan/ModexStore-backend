@@ -79,12 +79,24 @@ input GetProductInput{
       message: String,
       id:String
     }  
- 
+   
+    input CreateUserInput{
+     name:String
+       username: String
+      password:String
+      confirmpassword:String
+       email:String
+    telphone:String
+    }
+    type CreateUserResponse{
+        message:String      
+    }
     
   type RootMutation {
     addproduct(input: ProductInput): AddProductResponse,
      deleteproduct(input:DeleteProductInput) : DeleteProductResponse,
-     editproduct(input:EditProductInput) : EditPropductResponse
+     editproduct(input:EditProductInput) : EditPropductResponse,
+     createuser(input:CreateUserInput):CreateUserResponse
   }
 
   schema {

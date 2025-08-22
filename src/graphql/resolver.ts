@@ -1,4 +1,8 @@
 import { PrismaClient } from "@prisma/client";
+import { GraphQLError } from "graphql";
+import validator from 'validator'
+import bcrypt from 'bcrypt'
+
 export const prisma =new PrismaClient()
 type ProductInput = {
   name: string;
@@ -20,9 +24,12 @@ type EditProductInput ={
   type: string;
 }
   type User = {
-  id: number;
   name: string;
-  email: string;
+   username:string,
+   password:string,
+   confirmpassword:string,
+  email: string,
+  telphone:string
 }
 
 export const resolver={
@@ -143,6 +150,73 @@ getsearchproducts:async ({input}:{input:{search:string,activepage:number}})=>{
   const data= await prisma.product.findMany({where:{name:{contains:input.search}},skip:(input.activepage-1)*4,take:4})
   const length= (await prisma.product.findMany({where:{name:{contains:input.search}}})).length
   return {products:data,length}
+
+
+},
+createuser:async ({input}:{input:User})=>{
+ 
+     console.log(input)
+  
+         if(!validator.isLength(input.username, { min: 6, max: 20 })){
+               throw new GraphQLError("please enter a username from 6 to 20 hcarcter", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+         }
+
+      const findusername=await prisma.user.findFirst({where:{username:input.username}})
+          if(findusername){
+            throw new GraphQLError("Username already exists", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });   
+          }    
+         
+               if(!validator.isLength(input.password, { min: 6, max: 20 })){
+               throw new GraphQLError("please enter a password from 6 to 20 hcarcter", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+         }
+
+
+            if(input.password!==input.confirmpassword){
+            throw new GraphQLError("Please enter similiar password", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+          }
+                  if(!validator.isEmail(input.email)){
+                        throw new GraphQLError("ENTER A VALID EMAIL", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+                  }
+           const findemail=await prisma.user.findFirst({where:{email:input.email}})
+               if(findemail){
+            throw new GraphQLError("Email already exists", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+          }
+
+             const bcyptpass= await bcrypt.hash(input.password,20)
+
+      const newuser= await prisma.user.create({data:{name:input.name,username:input.username,password:bcyptpass,email:input.email,telphone:input.telphone}})
+           console.log(newuser)
+          return {message:'creeated new user'}
 
 
 },
