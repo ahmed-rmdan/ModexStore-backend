@@ -137,7 +137,15 @@ editproduct: async ({ input }: { input: EditProductInput }) => {
            return { message: "product has been edited", id:data.id };
 
 },
+getsearchproducts:async ({input}:{input:{search:string,activepage:number}})=>{
+  console.log(input.search)
+    
+  const data= await prisma.product.findMany({where:{name:{contains:input.search}},skip:(input.activepage-1)*4,take:4})
+  const length= (await prisma.product.findMany({where:{name:{contains:input.search}}})).length
+  return {products:data,length}
 
+
+},
 
 
 }

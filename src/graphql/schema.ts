@@ -30,11 +30,17 @@ type GetOffersResponse{
 input GetProductInput{
  id:String!
 }
-
+ input TypeSearchInput{
+ search:String
+ activepage:Int
+ }  
+ 
   type RootQuery {
     getproducts(input: TypeInput):GetProductsResponse ,
     getalloffers:GetOffersResponse,
-    getproduct(input:GetProductInput):GetProductResponse
+    getproduct(input:GetProductInput):GetProductResponse,
+    getsearchproducts(input:TypeSearchInput):GetProductsResponse
+
   }
 
   input ProductInput {
