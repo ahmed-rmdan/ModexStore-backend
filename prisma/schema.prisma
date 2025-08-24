@@ -33,5 +33,12 @@ model user{
   password String
   email    String
   telphone String
+  wishlist  Wishlist[]
+}
+model Wishlist{
+ id       String  @id @default(uuid())
+ productid String
+ userid    String 
+ user     user @relation(fields: [userid],references: [id])
 
 }

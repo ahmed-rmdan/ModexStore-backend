@@ -35,11 +35,18 @@ input GetProductInput{
  activepage:Int
  }  
  
+
+ type GetWishListResponse{
+ products:[GetProducts]
+ }
+
   type RootQuery {
     getproducts(input: TypeInput):GetProductsResponse ,
     getalloffers:GetOffersResponse,
     getproduct(input:GetProductInput):GetProductResponse,
-    getsearchproducts(input:TypeSearchInput):GetProductsResponse
+    getsearchproducts(input:TypeSearchInput):GetProductsResponse,
+    getwishlist:GetWishListResponse
+  
 
   }
 
@@ -91,12 +98,34 @@ input GetProductInput{
     type CreateUserResponse{
         message:String      
     }
+        input LoginInput{
+      username:String
+    password:String
+       }
+    type LoginResponse{
+      token:String,
+    userid:String,
+    name:String
+        }
+
+    input WishListInput{
+    userid:String
+    productid:String
+    
+    }
+
+   type WishListResponse{
+   message:String
+    }
     
   type RootMutation {
     addproduct(input: ProductInput): AddProductResponse,
      deleteproduct(input:DeleteProductInput) : DeleteProductResponse,
      editproduct(input:EditProductInput) : EditPropductResponse,
-     createuser(input:CreateUserInput):CreateUserResponse
+     createuser(input:CreateUserInput):CreateUserResponse,
+       login(input:LoginInput):LoginResponse,
+       addwishlist(input:WishListInput):WishListResponse
+
   }
 
   schema {

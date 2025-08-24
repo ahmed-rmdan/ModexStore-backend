@@ -3,13 +3,18 @@ import cors from 'cors'
 import multer from 'multer'
 import { v2 as cloudinary } from 'cloudinary'
 
-import { createHandler } from 'graphql-http/lib/use/express'
+import { createHandler   } from 'graphql-http/lib/use/express';
 import { resolver } from './graphql/resolver'
 import { schema } from './graphql/schema'
 import dotenv from 'dotenv'
 import fs from 'fs'
 import { setheaders } from './middleware'
 import { PrismaClient } from '@prisma/client'
+import sgMail from "@sendgrid/mail";
+import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken'
+
+
 
 const prisma=new PrismaClient()
 dotenv.config();
@@ -74,7 +79,25 @@ app.post('/uploadimge/:productid',upload.single('mainimge'),async (req,res)=>{
 
 
 
-app.all('/graphql', createHandler({ schema, rootValue: resolver, context: (req, res) => ({ req, res }) }))
+app.all('/graphql', createHandler({ schema, rootValue: resolver, context:(req:Request):any=>{
+         console.log('1')
+     const token=req.headers.authorization?.split(' ')[1]
+     console.log(token)
+         if(!token){
+          return {user:null}
+         }
+         const dectoken=  jwt.verify(token,'veryverysecret') as any
+           console.log(dectoken)
+           if(!dectoken){
+            return {user:null}
+           }
+           const userid=dectoken.userid 
+           console.log(userid)
+           return {user:userid}
+             
+}
+  
+  }) )
 
 app.listen(3000, () => {
   console.log("Server running on http://localhost:3000/graphql")

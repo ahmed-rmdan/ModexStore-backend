@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { GraphQLError } from "graphql";
 import validator from 'validator'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 export const prisma =new PrismaClient()
 type ProductInput = {
@@ -212,14 +213,72 @@ createuser:async ({input}:{input:User})=>{
               });
           }
 
-             const bcyptpass= await bcrypt.hash(input.password,20)
+             const bcyptpass= await bcrypt.hash(input.password,10)
 
       const newuser= await prisma.user.create({data:{name:input.name,username:input.username,password:bcyptpass,email:input.email,telphone:input.telphone}})
            console.log(newuser)
-          return {message:'creeated new user'}
-
-
+          return {message:'creeated new user'}}
+          ,
+          
+          
+          login :async ({input}:{input:{username:string,password:string}})=>{
+            console.log(input)
+           
+       const finduser=await prisma.user.findFirst({where:{username:input.username}})
+       if(!finduser){
+                   throw new GraphQLError("UserName is not correct", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+       }
+       console.log('1')
+     
+        
+         const coreectpass=await bcrypt.compare(input.password,finduser.password as string)
+         if(!coreectpass){
+                         throw new GraphQLError("password is not correct", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+         }
+         console.log('2')
+        const token=jwt.sign({userid:finduser.id},'veryverysecret',{expiresIn:'1h'})
+          
+        return {token,userid:finduser.id,name:finduser.name}
+                   
 },
+getwishlist:async ({input}:{input:{userid:string}},context : {user:null|string})=>{
+            const userid=context.user
+            if (!userid){
+                    throw new GraphQLError("not authorized", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+            }
+            const user=await prisma.user.findUnique({where:{id:userid},include:{wishlist:true}})
+            const userwishlist=user?.wishlist
+            if(!userwishlist){
+              console.log('if empty')
+              return {products:[]}
+            }
+
+            let wishlistproductid:string[]=[];
+
+            userwishlist.forEach(elm=>{
+              wishlistproductid.push(elm.productid)
+            })
+            const wishlistproducts=await prisma.product.findMany({where:{id:{in:wishlistproductid}}})
+            console.log('products',wishlistproductid)
+            return {products:wishlistproductid}
+
+
+}
 
 
 }
