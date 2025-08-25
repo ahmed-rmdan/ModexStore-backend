@@ -16,6 +16,18 @@ type GetProductsResponse{
  products:[GetProducts],
  length:Int
 }
+ type singleproduct{
+   id:String
+    name: String
+    moreinfo: String
+    mainimg: String
+    newprice: Int
+    oldprice: Int
+    slideimg: String
+    type: String 
+    offer:Boolean 
+    isfav:Boolean
+}
  input TypeInput{
  type:String
  activepage:Int
@@ -25,7 +37,7 @@ type GetOffersResponse{
  products:[GetProducts]
 }
  type GetProductResponse{
- product:GetProducts
+ product:singleproduct
 }
 input GetProductInput{
  id:String!
@@ -117,6 +129,13 @@ input GetProductInput{
    type WishListResponse{
    message:String
     }
+   input wishlistactionInput{
+    productid:String
+   }
+
+   type wishlistactionResponse{
+   message:String
+   }
     
   type RootMutation {
     addproduct(input: ProductInput): AddProductResponse,
@@ -124,7 +143,8 @@ input GetProductInput{
      editproduct(input:EditProductInput) : EditPropductResponse,
      createuser(input:CreateUserInput):CreateUserResponse,
        login(input:LoginInput):LoginResponse,
-       addwishlist(input:WishListInput):WishListResponse
+       addwishlist(input:WishListInput):WishListResponse,
+       wishlistaction(input:wishlistactionInput):wishlistactionResponse
 
   }
 

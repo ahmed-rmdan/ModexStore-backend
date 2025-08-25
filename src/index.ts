@@ -80,19 +80,20 @@ app.post('/uploadimge/:productid',upload.single('mainimge'),async (req,res)=>{
 
 
 app.all('/graphql', createHandler({ schema, rootValue: resolver, context:(req:Request):any=>{
-         console.log('1')
+         
      const token=req.headers.authorization?.split(' ')[1]
-     console.log(token)
+   
          if(!token){
           return {user:null}
          }
          const dectoken=  jwt.verify(token,'veryverysecret') as any
-           console.log(dectoken)
+         
+      
            if(!dectoken){
             return {user:null}
            }
            const userid=dectoken.userid 
-           console.log(userid)
+          
            return {user:userid}
              
 }

@@ -86,11 +86,22 @@ getalloffers:async ()=>{
 const data= await prisma.product.findMany({where:{offer:true}})
 return {products:data}
 },
-getproduct:async ({input}:{input:{id:string}})=>{
+getproduct:async ({input}:{input:{id:string}},context:{user:string|null})=>{
            console.log(input.id)
-          const product=await prisma.product.findUnique({where:{id:input.id}})
+           let isfav:boolean=false
+           const product=await prisma.product.findUnique({where:{id:input.id}})
+           if(!context.user){
+           
           console.log(product)
-          return {product};
+          return {product:{...product,isfav:false}};
+           }
+           const isexist=await prisma.wishlist.findFirst({where:{userid:context.user,productid:product?.id as string}})
+           if(!isexist){
+            return {product:{...product,isfav}};
+           }
+           isfav=true;
+           return {product:{...product,isfav}};
+          
 },
 deleteproduct:async ({input}:{input:{id:string}})=>{
            console.log(input.id)
@@ -274,11 +285,35 @@ getwishlist:async ({input}:{input:{userid:string}},context : {user:null|string})
               wishlistproductid.push(elm.productid)
             })
             const wishlistproducts=await prisma.product.findMany({where:{id:{in:wishlistproductid}}})
-            console.log('products',wishlistproductid)
-            return {products:wishlistproductid}
+            console.log('products',wishlistproducts)
+            return {products:wishlistproducts}
 
 
-}
+},
+wishlistaction:async ({input}:{input:{productid:string}},context : {user:null|string})=>{
+            const userid=context.user
+            if (!userid){
+                    throw new GraphQLError("not authorized", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+            }
+          
+             const ifexist=await prisma.wishlist.findFirst({where:{userid,productid:input.productid}})
+
+             if(!ifexist){
+              await prisma.wishlist.create({data:{productid:input.productid,userid}})
+              return {message:'wishlist added'}
+             }
+             await prisma.wishlist.delete({where:{id:ifexist?.id }})
+           return {message:'wishlist remove'}
+
+
+},
+
+
 
 
 }
