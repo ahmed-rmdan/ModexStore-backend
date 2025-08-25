@@ -86,15 +86,22 @@ app.all('/graphql', createHandler({ schema, rootValue: resolver, context:(req:Re
          if(!token){
           return {user:null}
          }
-         const dectoken=  jwt.verify(token,'veryverysecret') as any
-         
-      
-           if(!dectoken){
+         try{
+          const dectoken=  jwt.verify(token,'veryverysecret') as any
+             if(!dectoken){
             return {user:null}
            }
            const userid=dectoken.userid 
           
            return {user:userid}
+         }catch(err){
+         return {user:null}
+
+         }
+         
+         
+      
+        
              
 }
   
