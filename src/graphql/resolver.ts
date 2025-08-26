@@ -312,6 +312,23 @@ wishlistaction:async ({input}:{input:{productid:string}},context : {user:null|st
 
 
 },
+islogin:async (input:any,context : {user:null|string})=>{
+            const userid=context.user
+            console.log(userid)
+            if (!userid){
+                    throw new GraphQLError("not authorized", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+            }
+            console.log('sucess')
+          
+           return {message:'you are authorized'}
+            }
+
+
 
 
 

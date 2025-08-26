@@ -52,12 +52,18 @@ input GetProductInput{
  products:[GetProducts]
  }
 
+ type isloginResponse{
+ message:String
+ 
+ }
+
   type RootQuery {
     getproducts(input: TypeInput):GetProductsResponse ,
     getalloffers:GetOffersResponse,
     getproduct(input:GetProductInput):GetProductResponse,
     getsearchproducts(input:TypeSearchInput):GetProductsResponse,
-    getwishlist:GetWishListResponse
+    getwishlist:GetWishListResponse,
+    islogin:isloginResponse
   
 
   }
@@ -136,7 +142,7 @@ input GetProductInput{
    type wishlistactionResponse{
    message:String
    }
-    
+
   type RootMutation {
     addproduct(input: ProductInput): AddProductResponse,
      deleteproduct(input:DeleteProductInput) : DeleteProductResponse,
@@ -144,7 +150,8 @@ input GetProductInput{
      createuser(input:CreateUserInput):CreateUserResponse,
        login(input:LoginInput):LoginResponse,
        addwishlist(input:WishListInput):WishListResponse,
-       wishlistaction(input:wishlistactionInput):wishlistactionResponse
+       wishlistaction(input:wishlistactionInput):wishlistactionResponse,
+       islogin:isloginResponse
 
   }
 
