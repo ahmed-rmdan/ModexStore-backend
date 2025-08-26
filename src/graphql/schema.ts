@@ -143,6 +143,27 @@ input GetProductInput{
    message:String
    }
 
+type items{
+id:String,
+quantity:Int
+}   
+input orderproducts{
+productid:String,
+quantity:Int
+}
+input orderlocation{
+longitude:Float,
+latitude:Float
+}
+input createorderInput{
+items : [orderproducts]
+address : String
+location: orderlocation
+}
+type generalResponse{
+message:String
+}
+
   type RootMutation {
     addproduct(input: ProductInput): AddProductResponse,
      deleteproduct(input:DeleteProductInput) : DeleteProductResponse,
@@ -151,7 +172,8 @@ input GetProductInput{
        login(input:LoginInput):LoginResponse,
        addwishlist(input:WishListInput):WishListResponse,
        wishlistaction(input:wishlistactionInput):wishlistactionResponse,
-       islogin:isloginResponse
+       islogin:isloginResponse,
+       createorder(input:createorderInput):generalResponse
 
   }
 

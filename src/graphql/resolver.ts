@@ -32,7 +32,12 @@ type EditProductInput ={
   email: string,
   telphone:string
 }
+type createrderinput={
+items:{productid:string,quantity:number}[],
+address:string,
+location:{longitude:number,latitude:number}|null
 
+}
 export const resolver={
     hello:()=>'hello',
 
@@ -327,10 +332,57 @@ islogin:async (input:any,context : {user:null|string})=>{
           
            return {message:'you are authorized'}
             }
+,
+createorder:async ({input}:{input:createrderinput},context : {user:null|string})=>{
+            const userid=context.user
+            console.log(userid)
+            if (!userid){
+                    throw new GraphQLError("not authorized", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+            }
+               const curruser=await prisma.user.findUnique({where:{id:userid}})
+                            
+                               const productsid= input.items.map(elm=>{
+                                return elm.productid
+                               })
+                               console.log(productsid)
+                            const products=await prisma.product.findMany({where:{id:{in:productsid}}})
+                            let totalprice:number=0
+                               
+                            products.forEach((product,i)=>{
+                                 totalprice=totalprice+( product.newprice*(input.items[i]?.quantity as number))
+                            })
+                            
+                           let details:string=''
+                           input.items.forEach((item,i)=>{
+                           
+                           if(i===products.length-1){
+                            details=details+`${item.quantity} X ${products[i]?.name}`
+                           }else{
+                            details=details+`${item.quantity} X ${products[i]?.name} + `
+                           }
 
+                           })
+                           
+                           if(!input.location){
+                             const order= await prisma.order.create({data:{userid,name:curruser?.name as string,totalprice,details,payment:'On Delivery',state:'Processing',adress:input.address}})
+                              console.log(order)
+                             return{message:'order has been created'}
+                           }
+                     const location=await prisma.location.create({data:{latitude:input.location.latitude,longitude:input.location.longitude}})
 
+                 const order= await prisma.order.create({data:{userid,name:curruser?.name as string,totalprice,details,payment:'On Delivery',state:'Processing',adress:input.address,locationid:location.id}})
 
+                 console.log(order)
 
+                 return{message:'order has been created'}
+          
+            },
 
 
 }
+

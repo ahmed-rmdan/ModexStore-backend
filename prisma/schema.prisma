@@ -34,6 +34,7 @@ model user{
   email    String
   telphone String
   wishlist  Wishlist[]
+  orders    Order[] @relation(name: "userorderrelation")
 }
 model Wishlist{
  id       String  @id @default(uuid())
@@ -41,4 +42,26 @@ model Wishlist{
  userid    String 
  user     user @relation(fields: [userid],references: [id])
 
+}
+
+model Order{
+   id       String  @id @default(uuid())
+    userid    String 
+ user   user @relation(name: "userorderrelation",fields: [userid],references: [id])
+   name     String 
+  details    String 
+  payment    String 
+  state      String 
+  adress     String 
+  totalprice  Int
+  locationid   String? @unique
+  date        DateTime @default(now())
+  location    Location?  @relation(name: "LocationToOrder",fields: [locationid],references: [id])
+}
+model Location{
+   id       String  @id @default(uuid())
+   longitude  Float
+   latitude   Float
+   order      Order?  @relation(name: "LocationToOrder")
+ 
 }
