@@ -2,7 +2,6 @@ import express from 'express'
 import cors from 'cors'
 import multer from 'multer'
 import { v2 as cloudinary } from 'cloudinary'
-
 import { createHandler   } from 'graphql-http/lib/use/express';
 import { resolver } from './graphql/resolver'
 import { schema } from './graphql/schema'
@@ -13,7 +12,7 @@ import { PrismaClient } from '@prisma/client'
 import sgMail from "@sendgrid/mail";
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken'
-
+import Stripe from 'stripe';
 
 
 const prisma=new PrismaClient()
@@ -77,6 +76,54 @@ app.post('/uploadimge/:productid',upload.single('mainimge'),async (req,res)=>{
 })
 
 
+const stripe=new Stripe(process.env.stripe_secret_key as string)
+console.log(process.env.stripe_secret_key)
+
+app.post('/stripecheck',async (req,res)=>{
+  console.log('stripe')
+   const token=req.headers.authorization?.split(' ')[1]
+   console.log(token)
+ if(!token){
+  return res.status(401).send({message:'not authorized'})
+       }
+      try{
+    const dectoken= jwt.verify(token,'veryverysecret') as any
+             if(!dectoken){
+            return res.status(401).send({message:'not authorized'})
+               
+           }
+          }
+           catch(err){
+               return res.status(401).send({message:'not authorized'})
+           }
+
+          const items:{productid:string,quantity:number}[]= await req.body
+             console.log(items)
+                     const productsid= items.map(elm=>{
+                                return elm.productid
+                               })
+                const products=await prisma.product.findMany({where:{id:{in:productsid}}})
+                                
+                                     
+                                         const itemsstripe=products.map((product,i)=>{
+                                          return  {price_data:{
+                                                currency:'USD',
+                                      product_data:{name:`${product.name}`},
+                                  unit_amount:(product.newprice/50)*100
+                                      },quantity:items[i]?.quantity as number}
+                                                    })
+                              const payment=await stripe.checkout.sessions.create({
+                                line_items:itemsstripe
+                                ,
+                                mode:'payment',
+                                success_url:'http://localhost:5173/stripesucess',
+                                cancel_url:'http://localhost:5173/stripecancel'
+                              })
+                              console.log(payment.url)
+                     return res.status(200).json(payment.url)                 
+
+})
+
 
 
 app.all('/graphql', createHandler({ schema, rootValue: resolver, context:(req:Request):any=>{
@@ -87,7 +134,7 @@ app.all('/graphql', createHandler({ schema, rootValue: resolver, context:(req:Re
           return {user:null}
          }
          try{
-          const dectoken=  jwt.verify(token,'veryverysecret') as any
+          const dectoken= jwt.verify(token,'veryverysecret') as any
              if(!dectoken){
             return {user:null}
            }
@@ -97,11 +144,7 @@ app.all('/graphql', createHandler({ schema, rootValue: resolver, context:(req:Re
          }catch(err){
          return {user:null}
 
-         }
-         
-         
-      
-        
+         }       
              
 }
   
