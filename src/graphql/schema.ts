@@ -28,6 +28,7 @@ type GetProductsResponse{
     offer:Boolean 
     isfav:Boolean
 }
+
  input TypeInput{
  type:String
  activepage:Int
@@ -57,14 +58,34 @@ input GetProductInput{
  
  }
 
+type location{
+    longitude:Float,
+      latitude:Float
+           }
+
+  type order{
+  id:String,
+    name:String,
+    details:String,
+    at:String,
+    address:String,
+    state:String,
+    payment:String,
+    totalprice:Int,
+    location:location 
+  }
+  type getuserordersResponse{
+  orders:[order]
+  }
+
   type RootQuery {
     getproducts(input: TypeInput):GetProductsResponse ,
     getalloffers:GetOffersResponse,
     getproduct(input:GetProductInput):GetProductResponse,
     getsearchproducts(input:TypeSearchInput):GetProductsResponse,
     getwishlist:GetWishListResponse,
-    islogin:isloginResponse
-  
+    islogin:isloginResponse,
+    getuserorders:getuserordersResponse
 
   }
 

@@ -382,6 +382,44 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
                  return{message:'order has been created'}
           
             },
+            getuserorders:async (input:any,context : {user:null|string})=>{
+              console.log('getorddddders')
+            const userid=context.user
+            console.log(userid)
+            if (!userid){
+                    throw new GraphQLError("not authorized", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+            }
+            try{
+                     const orders=await prisma.order.findMany({where:{userid},include:{location:true}})
+                 
+
+                const userorders=orders.map((elm)=>{
+                   const at=elm.date.toLocaleDateString("en-GB",{ day: "2-digit", month: "2-digit", year: "numeric"})
+                    if(!elm.location){
+                       return {id:elm.id,name:elm.name,at,address:elm.adress,state:elm.state,payment:elm.payment,
+                    totalprice:elm.totalprice,details:elm.details,location:null}
+                    }else{
+                        return {id:elm.id,name:elm.name,at,address:elm.adress,state:elm.state,payment:elm.payment,
+                    totalprice:elm.totalprice,details:elm.details,location:{longitude:elm.location?.longitude,latitude:elm.location?.latitude}}
+                    }
+                  
+                })
+               console.log('sucess')
+
+                return {orders:userorders}
+            }catch(err){
+              console.log(err)
+            }
+             
+          
+           
+            }
+,
 
 
 }
