@@ -267,7 +267,7 @@ createuser:async ({input}:{input:User})=>{
         return {token,userid:finduser.id,name:finduser.name}
                    
 },
-getwishlist:async ({input}:{input:{userid:string}},context : {user:null|string})=>{
+getwishlist:async ({input}:{input:{page:number}},context : {user:null|string})=>{
             const userid=context.user
             if (!userid){
                     throw new GraphQLError("not authorized", {
@@ -289,9 +289,10 @@ getwishlist:async ({input}:{input:{userid:string}},context : {user:null|string})
             userwishlist.forEach(elm=>{
               wishlistproductid.push(elm.productid)
             })
-            const wishlistproducts=await prisma.product.findMany({where:{id:{in:wishlistproductid}}})
-            console.log('products',wishlistproducts)
-            return {products:wishlistproducts}
+            console.log(input.page)
+            const wishlistproducts=await prisma.product.findMany({where:{id:{in:wishlistproductid}},skip:(input.page-1)*6,take:6})
+           
+            return {products:wishlistproducts,length:userwishlist.length}
 
 
 },
@@ -382,8 +383,8 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
                  return{message:'order has been created'}
           
             },
-            getuserorders:async (input:any,context : {user:null|string})=>{
-              console.log('getorddddders')
+            getuserorders:async ({input}:{input:{page:number}},context : {user:null|string})=>{
+              console.log('getordddddenbhhhhrs')
             const userid=context.user
             console.log(userid)
             if (!userid){
@@ -395,8 +396,12 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
               });
             }
             try{
-                     const orders=await prisma.order.findMany({where:{userid},include:{location:true}})
-                 
+
+
+                    console.log(input.page)
+                    const orderslength=(await prisma.order.findMany({where:{userid}})).length
+                     const orders=await prisma.order.findMany({where:{userid},include:{location:true},skip:(input.page-1)*6,take:6})
+                             
 
                 const userorders=orders.map((elm)=>{
                    const at=elm.date.toLocaleDateString("en-GB",{ day: "2-digit", month: "2-digit", year: "numeric"})
@@ -410,16 +415,54 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
                   
                 })
                console.log('sucess')
-
-                return {orders:userorders}
+                      console.log(userorders)
+                return {orders:userorders,length:orderslength}
             }catch(err){
               console.log(err)
             }
              
           
            
+            },
+                getadminorders:async ({input}:{input:{page:number}},context : {user:null|string})=>{
+              console.log('getorddddders')
+            const userid=context.user
+            console.log(userid)
+            if (!userid){
+                    throw new GraphQLError("not authorized", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
             }
-,
+            try{
+                        const orderslegnth=(await prisma.order.findMany()).length
+                     const orders=await prisma.order.findMany({include:{location:true},skip:((input.page-1)*3),take:3})
+                 
+
+                const adminorders=orders.map((elm)=>{
+                   const at=elm.date.toLocaleDateString("en-GB",{ day: "2-digit", month: "2-digit", year: "numeric"})
+                    if(!elm.location){
+                       return {id:elm.id,name:elm.name,at,address:elm.adress,state:elm.state,payment:elm.payment,
+                    totalprice:elm.totalprice,details:elm.details,location:null}
+                    }else{
+                        return {id:elm.id,name:elm.name,at,address:elm.adress,state:elm.state,payment:elm.payment,
+                    totalprice:elm.totalprice,details:elm.details,location:{longitude:elm.location?.longitude,latitude:elm.location?.latitude}}
+                    }
+                  
+                })
+               console.log('sucess')
+
+                return {orders:adminorders,length:orderslegnth}
+            }catch(err){
+              console.log(err)
+            }
+             
+          
+           
+            },
+
 
 
 }

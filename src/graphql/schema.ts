@@ -48,9 +48,12 @@ input GetProductInput{
  activepage:Int
  }  
  
-
+input getwishlistInput{
+page:Int
+}
  type GetWishListResponse{
- products:[GetProducts]
+ products:[GetProducts],
+ length:Int
  }
 
  type isloginResponse{
@@ -74,8 +77,15 @@ type location{
     totalprice:Int,
     location:location 
   }
+
+  input getuserordersInput{
+    page:Int
+    }
+
+
   type getuserordersResponse{
-  orders:[order]
+  orders:[order],
+  length:Int
   }
 
   type RootQuery {
@@ -83,9 +93,10 @@ type location{
     getalloffers:GetOffersResponse,
     getproduct(input:GetProductInput):GetProductResponse,
     getsearchproducts(input:TypeSearchInput):GetProductsResponse,
-    getwishlist:GetWishListResponse,
+    getwishlist(input:getwishlistInput):GetWishListResponse,
     islogin:isloginResponse,
-    getuserorders:getuserordersResponse
+    getuserorders(input:getuserordersInput):getuserordersResponse,
+    getadminorders(input:getuserordersInput):getuserordersResponse
 
   }
 
