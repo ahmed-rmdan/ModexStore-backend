@@ -90,13 +90,16 @@ type location{
 
   type RootQuery {
     getproducts(input: TypeInput):GetProductsResponse ,
+    getadminproducts(input: TypeInput):GetProductsResponse ,
     getalloffers:GetOffersResponse,
     getproduct(input:GetProductInput):GetProductResponse,
     getsearchproducts(input:TypeSearchInput):GetProductsResponse,
     getwishlist(input:getwishlistInput):GetWishListResponse,
     islogin:isloginResponse,
+     getadminoffers:GetOffersResponse,
     getuserorders(input:getuserordersInput):getuserordersResponse,
-    getadminorders(input:getuserordersInput):getuserordersResponse
+    getadminorders(input:getuserordersInput):getuserordersResponse,
+    isadmin:isloginResponse
 
   }
 
@@ -211,6 +214,9 @@ input deleteorderInput{
       type editorderResponse{
       message:String
       }
+      type loginadminResponse{
+      token:String
+      }
 
   type RootMutation {
     addproduct(input: ProductInput): AddProductResponse,
@@ -223,7 +229,9 @@ input deleteorderInput{
        islogin:isloginResponse,
        createorder(input:createorderInput):generalResponse,
        deleteorder(input:deleteorderInput):deleteorderResponse,
-       editorder(input:editorderInput):editorderResponse
+       editorder(input:editorderInput):editorderResponse,
+        loginadmin(input:LoginInput):loginadminResponse,
+          isadmin:isloginResponse
 
   }
 

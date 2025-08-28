@@ -41,7 +41,25 @@ location:{longitude:number,latitude:number}|null
 export const resolver={
     hello:()=>'hello',
 
-addproduct: async ({ input }: { input: ProductInput }) => {
+addproduct: async ({ input }: { input: ProductInput },context: {user:null|string}) => {
+  if(!context.user){
+                     throw new GraphQLError("not authorized", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+       }
+       const finduser=await prisma.user.findUnique({where:{id:context.user}})
+       if(finduser?.username!=='adminn'){
+                   throw new GraphQLError("you are not the admin", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+       }
+
   let offer = false;
   if (input.oldprice !== input.newprice) {
     offer = true;
@@ -87,7 +105,70 @@ else{
 }
 
 },
-getalloffers:async ()=>{
+getadminproducts:async ({input}:{input:{type:string,activepage:number}},context: {user:null|string})=>{
+       if(!context.user){
+                     throw new GraphQLError("not authorized", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+       }
+       const finduser=await prisma.user.findUnique({where:{id:context.user}})
+       if(finduser?.username!=='adminn'){
+                   throw new GraphQLError("you are not the admin", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+       }
+
+
+  console.log(input.type)
+if (input.type==='allproducts'){
+  const data= await prisma.product.findMany({skip:(input.activepage-1)*4,take:4})
+  const length=(await prisma.product.findMany()).length
+  return {products:data,length }
+
+}if(input.type==='offers'){
+   const data= await prisma.product.findMany({where:{offer:true},skip:(input.activepage-1)*4,take:4})
+    const length=(await prisma.product.findMany({where:{offer:true}})).length
+  return {products:data,length}
+}
+else{
+  const data= await prisma.product.findMany({where:{type:input.type},skip:(input.activepage-1)*4,take:4})
+  const length= (await prisma.product.findMany({where:{type:input.type}})).length
+  return {products:data,length}
+}
+
+},
+getalloffers:async (input:any)=>{
+
+
+
+const data= await prisma.product.findMany({where:{offer:true}})
+return {products:data}
+},
+getadminoffers:async (input:any,context:{user:string|null})=>{
+    if(!context.user){
+                     throw new GraphQLError("not authorized", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+       }
+       const finduser=await prisma.user.findUnique({where:{id:context.user}})
+       if(finduser?.username!=='adminn'){
+                   throw new GraphQLError("you are not the admin", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+       }
+
 const data= await prisma.product.findMany({where:{offer:true}})
 return {products:data}
 },
@@ -108,14 +189,50 @@ getproduct:async ({input}:{input:{id:string}},context:{user:string|null})=>{
            return {product:{...product,isfav}};
           
 },
-deleteproduct:async ({input}:{input:{id:string}})=>{
+deleteproduct:async ({input}:{input:{id:string}},context:{user:string|null})=>{
+      if(!context.user){
+                     throw new GraphQLError("not authorized", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+       }
+       const finduser=await prisma.user.findUnique({where:{id:context.user}})
+       if(finduser?.username!=='adminn'){
+                   throw new GraphQLError("you are not the admin", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+       }
            console.log(input.id)
           await prisma.product.delete({where:{id:input.id}})
           
           return {message:'product has been deleted'};
 },
 
-editproduct: async ({ input }: { input: EditProductInput }) => {
+editproduct: async ({ input }: { input: EditProductInput },context:{user:string|null}) => {
+    if(!context.user){
+                     throw new GraphQLError("not authorized", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+       }
+       const finduser=await prisma.user.findUnique({where:{id:context.user}})
+       if(finduser?.username!=='adminn'){
+                   throw new GraphQLError("you are not the admin", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+       }
+
+
   let offer = false;
       const data = {
         id:input.id,
@@ -234,9 +351,7 @@ createuser:async ({input}:{input:User})=>{
       const newuser= await prisma.user.create({data:{name:input.name,username:input.username,password:bcyptpass,email:input.email,telphone:input.telphone}})
            console.log(newuser)
           return {message:'creeated new user'}}
-          ,
-          
-          
+          ,     
           login :async ({input}:{input:{username:string,password:string}})=>{
             console.log(input)
            
@@ -424,8 +539,9 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
           
            
             },
-                getadminorders:async ({input}:{input:{page:number}},context : {user:null|string})=>{
-              console.log('getorddddders')
+      
+     getadminorders:async ({input}:{input:{page:number}},context : {user:null|string})=>{
+              
             const userid=context.user
             console.log(userid)
             if (!userid){
@@ -436,6 +552,16 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
              }
               });
             }
+                    const finduser=await prisma.user.findUnique({where:{id:userid}})
+                  if(finduser?.username!=='adminn'){
+                   throw new GraphQLError("you are not the admin", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+               }
+
             try{
                         const orderslegnth=(await prisma.order.findMany()).length
                      const orders=await prisma.order.findMany({include:{location:true},skip:((input.page-1)*3),take:3})
@@ -474,6 +600,17 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
              }
               });
             }
+                      const finduser=await prisma.user.findUnique({where:{id:userid}})
+                  if(finduser?.username!=='adminn'){
+                   throw new GraphQLError("you are not the admin", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+               }
+
+
             try{
                       await prisma.order.delete({where:{id:input.orderid}}) 
 
@@ -500,6 +637,17 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
              }
               });
             }
+
+         const finduser=await prisma.user.findUnique({where:{id:userid}})
+                 if(finduser?.username!=='adminn'){
+                   throw new GraphQLError("you are not the admin", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              }); 
+               }
+
             try{
 
                  await prisma.order.update({where:{id:input.orderid},data:{state:input.state}}) 
@@ -514,6 +662,70 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
         }
            
             },
+
+          loginadmin:async({input}:{input:{username:string,password:string}})=>{
+            console.log(input)
+           
+       const finduser=await prisma.user.findFirst({where:{username:input.username}})
+       if(!finduser){
+                   throw new GraphQLError("UserName is not correct", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+       }
+       console.log('1')
+           
+       if(finduser.username!=='adminn'){
+                             throw new GraphQLError("you are not the admin", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+       }
+                 
+         const coreectpass=await bcrypt.compare(input.password,finduser.password as string)
+         if(!coreectpass){
+                         throw new GraphQLError("password is not correct", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+         }
+         console.log('2')
+        const token=jwt.sign({userid:finduser.id},'veryverysecret',{expiresIn:'1h'})
+          
+        return {token}
+                   
+},
+isadmin:async (input:any,context : {user:null|string})=>{
+            const userid=context.user
+            console.log(userid)
+            if (!userid){
+                    throw new GraphQLError("not authorized", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+            }
+            const finduser=await prisma.user.findUnique({where:{id:userid}})
+            if(finduser?.username!=='adminn'){
+                         throw new GraphQLError("not you are not the admin", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+            }
+            console.log('sucess')
+          
+           return {message:'you are the admin'}
+            }
+,
 
 
 
