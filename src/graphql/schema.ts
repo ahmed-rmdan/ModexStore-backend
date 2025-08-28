@@ -204,6 +204,14 @@ input deleteorderInput{
       message:String
      }
 
+      input editorderInput{
+        orderid:String
+        state:String
+      }
+      type editorderResponse{
+      message:String
+      }
+
   type RootMutation {
     addproduct(input: ProductInput): AddProductResponse,
      deleteproduct(input:DeleteProductInput) : DeleteProductResponse,
@@ -214,7 +222,8 @@ input deleteorderInput{
        wishlistaction(input:wishlistactionInput):wishlistactionResponse,
        islogin:isloginResponse,
        createorder(input:createorderInput):generalResponse,
-       deleteorder(input:deleteorderInput):deleteorderResponse
+       deleteorder(input:deleteorderInput):deleteorderResponse,
+       editorder(input:editorderInput):editorderResponse
 
   }
 
