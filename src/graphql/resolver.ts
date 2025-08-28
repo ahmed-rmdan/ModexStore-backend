@@ -462,6 +462,32 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
           
            
             },
+          deleteorder:async ({input}:{input:{orderid:string}},context : {user:null|string})=>{
+              console.log('getorddddders')
+            const userid=context.user
+            console.log(userid)
+            if (!userid){
+                    throw new GraphQLError("not authorized", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+             }
+              });
+            }
+            try{
+                      await prisma.order.delete({where:{id:input.orderid}}) 
+
+                return {message:'order has been deleted'}
+            }catch(err){
+                          throw new GraphQLError("somthing wet wrong", {
+              extensions: {
+           code: "BAD_USER_INPUT",
+           http: { status: 409 }, 
+            }
+          })
+        }
+           
+            },
 
 
 

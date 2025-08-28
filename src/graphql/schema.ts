@@ -196,6 +196,14 @@ type generalResponse{
 message:String
 }
 
+input deleteorderInput{
+  orderid:String
+}
+ 
+     type deleteorderResponse{
+      message:String
+     }
+
   type RootMutation {
     addproduct(input: ProductInput): AddProductResponse,
      deleteproduct(input:DeleteProductInput) : DeleteProductResponse,
@@ -205,7 +213,8 @@ message:String
        addwishlist(input:WishListInput):WishListResponse,
        wishlistaction(input:wishlistactionInput):wishlistactionResponse,
        islogin:isloginResponse,
-       createorder(input:createorderInput):generalResponse
+       createorder(input:createorderInput):generalResponse,
+       deleteorder(input:deleteorderInput):deleteorderResponse
 
   }
 
