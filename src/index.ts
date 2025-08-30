@@ -75,7 +75,6 @@ app.post('/uploadimge/:productid',upload.single('mainimge'),async (req,res)=>{
 
 })
 
-
 const stripe=new Stripe(process.env.stripe_secret_key as string)
 console.log(process.env.stripe_secret_key)
 
@@ -149,6 +148,12 @@ app.all('/graphql', createHandler({ schema, rootValue: resolver, context:(req:Re
 }
   
   }) )
+
+
+
+
+
+
 
 app.listen(3000, () => {
   console.log("Server running on http://localhost:3000/graphql")

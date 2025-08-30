@@ -11,7 +11,7 @@ type ProductInput = {
   mainimge: string;
   newprice: number;
   oldprice: number;
-  sliderimge: string;
+  sliderimge: string[];
   type: string;
 };
 type EditProductInput ={
@@ -64,6 +64,7 @@ addproduct: async ({ input }: { input: ProductInput },context: {user:null|string
   if (input.oldprice !== input.newprice) {
     offer = true;
   }
+  const slideimg=input.sliderimge.join(',')
 console.log(input.oldprice !== input.newprice)
   const data = {
     name: input.name,
@@ -72,7 +73,7 @@ console.log(input.oldprice !== input.newprice)
     moreinfo: input.moreinfo,
     newprice: input.newprice,
     oldprice: input.oldprice,
-    slideimg: input.sliderimge,
+    slideimg,
     offer:offer
   };
 

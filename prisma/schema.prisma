@@ -21,9 +21,9 @@ model product {
   oldprice Int
   newprice Int
   offer    Boolean @default(false)
-  moreinfo String
+  moreinfo String @db.Text
   mainimg  String
-  slideimg String
+  slideimg String @db.Text
 }
 
 model user{

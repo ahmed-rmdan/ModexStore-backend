@@ -109,7 +109,7 @@ type location{
     mainimge: String
     newprice: Int
     oldprice: Int
-    sliderimge: String
+    sliderimge: [String]
     type: String  
   }
   input EditProductInput{
