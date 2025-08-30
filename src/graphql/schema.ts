@@ -149,7 +149,8 @@ type location{
     telphone:String
     }
     type CreateUserResponse{
-        message:String      
+        message:String,
+        token:String     
     }
         input LoginInput{
       username:String

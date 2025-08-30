@@ -350,8 +350,14 @@ createuser:async ({input}:{input:User})=>{
 
       const newuser= await prisma.user.create({data:{name:input.name,username:input.username,password:bcyptpass,email:input.email,telphone:input.telphone}})
            console.log(newuser)
-          return {message:'creeated new user'}}
-          ,     
+
+
+          const token=jwt.sign({userid:newuser.id},'veryverysecret',{expiresIn:'1h'})
+
+          return {message:'creeated new user',token}}
+          ,
+          
+          
           login :async ({input}:{input:{username:string,password:string}})=>{
             console.log(input)
            
@@ -491,9 +497,13 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
                            }
                      const location=await prisma.location.create({data:{latitude:input.location.latitude,longitude:input.location.longitude}})
 
-                 const order= await prisma.order.create({data:{userid,name:curruser?.name as string,totalprice,details,payment:'On Delivery',state:'Processing',adress:input.address,locationid:location.id}})
-
+                 const order= await prisma.order.create({data:{userid,name:curruser?.name as string,totalprice,details,payment:'On Delivery'
+                  ,state:'Processing',adress:input.address,locationid:location.id}})
+                  
                  console.log(order)
+
+                      
+                   
 
                  return{message:'order has been created'}
           
@@ -589,7 +599,7 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
            
             },
           deleteorder:async ({input}:{input:{orderid:string}},context : {user:null|string})=>{
-              console.log('getorddddders')
+            
             const userid=context.user
             console.log(userid)
             if (!userid){
@@ -609,12 +619,16 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
              }
               }); 
                }
-
-
             try{
-                      await prisma.order.delete({where:{id:input.orderid}}) 
-
+                       const order=await prisma.order.findUnique({where:{id:input.orderid,},include:{location:true}})
+                       if(!order?.location){
+                        await prisma.order.delete({where:{id:input.orderid}}) 
+                         return {message:'order has been deleted'}
+                       }
+                         await prisma.location.delete({where:{id:order.location.id}})
+                          await prisma.order.delete({where:{id:input.orderid}}) 
                 return {message:'order has been deleted'}
+
             }catch(err){
                           throw new GraphQLError("somthing wet wrong", {
               extensions: {
