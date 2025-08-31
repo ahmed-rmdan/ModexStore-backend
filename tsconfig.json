@@ -10,9 +10,9 @@
         "moduleResolution": "node",
     "module": "commonjs",
     "target": "es2016",
-
+    "types": ["node"],
      "esModuleInterop":true,
-  
+  "typeRoots": ["./node_modules/@types"],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
