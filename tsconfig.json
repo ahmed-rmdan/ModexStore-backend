@@ -17,6 +17,7 @@
     // "lib": ["esnext"],
     // "types": ["node"],
     // and npm install -D @types/node
+    "forceConsistentCasingInFileNames": true,
 
     // Other Outputs
     "sourceMap": true,                                                                                                                                                                                
