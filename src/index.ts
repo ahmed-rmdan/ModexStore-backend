@@ -115,8 +115,8 @@ app.post('/stripecheck',async (req,res)=>{
                                 line_items:itemsstripe
                                 ,
                                 mode:'payment',
-                                success_url:'http://localhost:5173/stripesucess',
-                                cancel_url:'http://localhost:5173/stripecancel'
+                                success_url:'https://modexstore-backend.onrender.com/stripesucess',
+                                cancel_url:'https://modexstore-backend.onrender.com/stripecancel'
                               })
                               console.log(payment.url)
                      return res.status(200).json(payment.url)                 
@@ -153,8 +153,8 @@ app.all('/graphql', createHandler({ schema, rootValue: resolver, context:(req:Re
 
 
 
-const port=Number(process.env.port)||3000
+const port=process.env.port||3000
 
 app.listen(port, () => {
-  console.log("Server running on http://localhost:3000/graphql")
+  console.log("Server running on https://modexstore-backend.onrender.com")
 })
