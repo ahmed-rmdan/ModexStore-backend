@@ -46,7 +46,7 @@ app.use(express.json({ limit: "10mb" }));
 // const lol="http://localhost:5173"
 
 app.use(cors({
-  origin: ["https://modexstore.netlify.app","http://localhost:5173"],
+  origin: "https://modexstore.netlify.app",
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
