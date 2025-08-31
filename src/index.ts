@@ -43,10 +43,10 @@ const app = express()
 
 app.use(express.json({ limit: "10mb" }));
 
-
+// const lol="http://localhost:5173"
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: ["https://modexstore.netlify.app/"],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
@@ -153,8 +153,8 @@ app.all('/graphql', createHandler({ schema, rootValue: resolver, context:(req:Re
 
 
 
+const port=Number(process.env.port)||3000
 
-
-app.listen(3000, () => {
+app.listen(port, () => {
   console.log("Server running on http://localhost:3000/graphql")
 })
