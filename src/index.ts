@@ -13,7 +13,8 @@ import sgMail from "@sendgrid/mail";
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken'
 import Stripe from 'stripe';
-
+import { Server, Socket } from 'socket.io';
+import { JwtPayload } from 'jsonwebtoken';
 
 const prisma=new PrismaClient()
 dotenv.config();
@@ -151,10 +152,30 @@ app.all('/graphql', createHandler({ schema, rootValue: resolver, context:(req:Re
 
 
 
-
+let io:Server;
 
 const port=process.env.port||3000
-
-app.listen(port, () => {
+const server=app.listen(port, () => {
   console.log("Server running on https://modexstore-backend.onrender.com")
 })
+
+io=new Server(server,{cors:{origin:'*'}})
+io.on('connection',(socket)=>{
+  const token:string=socket.handshake.auth.token
+const dectoken= jwt.verify(token,'veryverysecret') as JwtPayload
+const userid:string=dectoken.userid 
+
+socket.on('joinuserroom',async ()=>{
+  console.log(socket.id)
+socket.join(userid)
+console.log(userid)
+console.log(socket.rooms)
+})
+socket.on('disconnect',()=>{
+
+})
+
+
+})
+
+export {io};

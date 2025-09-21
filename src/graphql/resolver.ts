@@ -3,6 +3,7 @@ import { GraphQLError } from "graphql";
 import validator from 'validator'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import { io } from "..";
 
 export const prisma =new PrismaClient()
 type ProductInput = {
@@ -666,6 +667,12 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
             try{
 
                  await prisma.order.update({where:{id:input.orderid},data:{state:input.state}}) 
+                   const order=await prisma.order.findUnique({where:{id:input.orderid}})
+                     const orderuserid=order!.userid
+                      const userorders=await prisma.order.findMany({where:{userid:orderuserid}})
+
+                       console.log('the userid',orderuserid)
+                 io.to(orderuserid as string).emit('getorders',{orders:userorders})
                 return {message:'order has been edited'}
             }catch(err){
                           throw new GraphQLError("somthing wet wrong", {
