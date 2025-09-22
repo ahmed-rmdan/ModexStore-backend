@@ -7,14 +7,16 @@ import { resolver } from './graphql/resolver'
 import { schema } from './graphql/schema'
 import dotenv from 'dotenv'
 import fs from 'fs'
-import { setheaders } from './middleware'
+
 import { PrismaClient } from '@prisma/client'
-import sgMail from "@sendgrid/mail";
-import { Request, Response } from 'express';
+
+import { Request } from 'express';
 import jwt from 'jsonwebtoken'
 import Stripe from 'stripe';
 import { Server, Socket } from 'socket.io';
 import { JwtPayload } from 'jsonwebtoken';
+import {resetpass} from './restapi'
+import { confirmnewpass } from './restapi';
 
 const prisma=new PrismaClient()
 dotenv.config();
@@ -41,17 +43,18 @@ const app = express()
 
 
 
-
-app.use(express.json({ limit: "10mb" }));
-
-// const lol="http://localhost:5173"
-
 app.use(cors({
   origin: ["https://modexstore.netlify.app","http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization",'Access-Control-Allow-Origin'],
   credentials: true
 }));
+
+app.use(express.json({ limit: "10mb" }));
+
+
+
+
 
 
 app.post('/uploadimge/:productid',upload.single('mainimge'),async (req,res)=>{
@@ -123,6 +126,10 @@ app.post('/stripecheck',async (req,res)=>{
                      return res.status(200).json(payment.url)                 
 
 })
+
+
+app.post('/resetpassword', resetpass)
+app.post('/confirmnewpass', confirmnewpass)
 
 
 
