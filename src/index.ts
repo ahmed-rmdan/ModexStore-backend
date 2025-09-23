@@ -28,14 +28,15 @@ cloudinary.config({
 
 })
 
-const storge=multer.diskStorage({
-  destination(req, file, callback) {
-    callback(null,'upload/')
-  },
-  filename(req, file, callback) { 
-    callback(null,Date.now()+'-'+file.originalname)
-  },
-})
+// const storge=multer.diskStorage({
+//   destination(req, file, callback) {
+//     callback(null,'upload/')
+//   },
+//   filename(req, file, callback) { 
+//     callback(null,Date.now()+'-'+file.originalname)
+//   },
+// })
+const storge = multer.memoryStorage();
 
 const upload=multer({storage:storge,limits:{ fileSize: 10 * 1024 * 1024 }})
 
@@ -58,20 +59,32 @@ app.use(express.json({ limit: "10mb" }));
 
 
 app.post('/uploadimge/:productid',upload.single('mainimge'),async (req,res)=>{
-  
+  try{
  const id=req.params.productid
  console.log(id)
  if(!id){
   res.status(401).send({message:'productid not found'})
  }
-    const result = await cloudinary.uploader.upload(req.file!.path, {
-      folder: "modexstore",
-    });
-    console.log(result.secure_url)
-          // fs.unlinkSync(req.file?.path as string)
-    try{
-  await prisma.product.update({where:{id:id as string},data:{mainimg:result.secure_url}})
-   res.status(200).send({message:'main img has been added'})
+ if (!req.file) return res.status(400).send({ message: 'file not found' });
+
+   const result = await cloudinary.uploader.upload_stream(
+      { folder: "modexstore" },
+      async (error, result) => {
+        if (error) return res.status(500).send({ message: 'upload failed', error });
+           
+        await prisma.product.update({
+          where: { id :id as string },
+          data: { mainimg: result!.secure_url }
+        });
+
+        res.status(200).send({ message: 'main img has been added' });
+      }
+    );
+
+   
+    result.end(req.file.buffer);
+
+
     }catch(err){
           console.log(err)
            res.status(401).send({message:'upload failed'})
