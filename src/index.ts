@@ -60,6 +60,7 @@ app.use(express.json({ limit: "10mb" }));
 app.post('/uploadimge/:productid',upload.single('mainimge'),async (req,res)=>{
   
  const id=req.params.productid
+ console.log(id)
  if(!id){
   res.status(401).send({message:'productid not found'})
  }
@@ -67,7 +68,7 @@ app.post('/uploadimge/:productid',upload.single('mainimge'),async (req,res)=>{
       folder: "modexstore",
     });
     console.log(result.secure_url)
-          fs.unlinkSync(req.file?.path as string)
+          // fs.unlinkSync(req.file?.path as string)
     try{
   await prisma.product.update({where:{id:id as string},data:{mainimg:result.secure_url}})
    res.status(200).send({message:'main img has been added'})

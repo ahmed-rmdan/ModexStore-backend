@@ -89,7 +89,7 @@ try {
 }
 },
 getproducts:async ({input}:{input:{type:string,activepage:number}})=>{
-  console.log(input.type)
+
 if (input.type==='allproducts'){
   const data= await prisma.product.findMany({skip:(input.activepage-1)*4,take:4})
   const length=(await prisma.product.findMany()).length
@@ -127,7 +127,7 @@ getadminproducts:async ({input}:{input:{type:string,activepage:number}},context:
        }
 
 
-  console.log(input.type)
+ 
 if (input.type==='allproducts'){
   const data= await prisma.product.findMany({skip:(input.activepage-1)*4,take:4})
   const length=(await prisma.product.findMany()).length
@@ -175,7 +175,7 @@ const data= await prisma.product.findMany({where:{offer:true}})
 return {products:data}
 },
 getproduct:async ({input}:{input:{id:string}},context:{user:string|null})=>{
-           console.log(input.id)
+          
            let isfav:boolean=false
            const product=await prisma.product.findUnique({where:{id:input.id}})
            if(!context.user){
@@ -281,7 +281,7 @@ editproduct: async ({ input }: { input: EditProductInput },context:{user:string|
 
 },
 getsearchproducts:async ({input}:{input:{search:string,activepage:number}})=>{
-  console.log(input.search)
+ 
     
   const data= await prisma.product.findMany({where:{name:{contains:input.search}},skip:(input.activepage-1)*4,take:4})
   const length= (await prisma.product.findMany({where:{name:{contains:input.search}}})).length
@@ -291,7 +291,7 @@ getsearchproducts:async ({input}:{input:{search:string,activepage:number}})=>{
 },
 createuser:async ({input}:{input:User})=>{
  
-     console.log(input)
+
   
          if(!validator.isLength(input.username, { min: 6, max: 20 })){
                throw new GraphQLError("please enter a username from 6 to 20 hcarcter", {
@@ -361,7 +361,7 @@ createuser:async ({input}:{input:User})=>{
           
           
           login :async ({input}:{input:{username:string,password:string}})=>{
-            console.log(input)
+       
            
        const finduser=await prisma.user.findFirst({where:{username:input.username}})
        if(!finduser){
@@ -372,7 +372,7 @@ createuser:async ({input}:{input:User})=>{
              }
               });
        }
-       console.log('1')
+
      
         
          const coreectpass=await bcrypt.compare(input.password,finduser.password as string)
@@ -384,7 +384,7 @@ createuser:async ({input}:{input:User})=>{
              }
               });
          }
-         console.log('2')
+
         const token=jwt.sign({userid:finduser.id},'veryverysecret',{expiresIn:'1h'})
           
         return {token,userid:finduser.id,name:finduser.name}
@@ -403,7 +403,7 @@ getwishlist:async ({input}:{input:{page:number}},context : {user:null|string})=>
             const user=await prisma.user.findUnique({where:{id:userid},include:{wishlist:true}})
             const userwishlist=user?.wishlist
             if(!userwishlist){
-              console.log('if empty')
+         
               return {products:[]}
             }
 
@@ -412,7 +412,7 @@ getwishlist:async ({input}:{input:{page:number}},context : {user:null|string})=>
             userwishlist.forEach(elm=>{
               wishlistproductid.push(elm.productid)
             })
-            console.log(input.page)
+       
             const wishlistproducts=await prisma.product.findMany({where:{id:{in:wishlistproductid}},skip:(input.page-1)*6,take:6})
            
             return {products:wishlistproducts,length:userwishlist.length}
@@ -443,7 +443,7 @@ wishlistaction:async ({input}:{input:{productid:string}},context : {user:null|st
 },
 islogin:async (input:any,context : {user:null|string})=>{
             const userid=context.user
-            console.log(userid)
+      
             if (!userid){
                     throw new GraphQLError("not authorized", {
               extensions: {
@@ -459,7 +459,7 @@ islogin:async (input:any,context : {user:null|string})=>{
 ,
 createorder:async ({input}:{input:createrderinput},context : {user:null|string})=>{
             const userid=context.user
-            console.log(userid)
+     
             if (!userid){
                     throw new GraphQLError("not authorized", {
               extensions: {
@@ -511,9 +511,9 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
           
             },
             getuserorders:async ({input}:{input:{page:number}},context : {user:null|string})=>{
-              console.log('getordddddenbhhhhrs')
+      
             const userid=context.user
-            console.log(userid)
+        
             if (!userid){
                     throw new GraphQLError("not authorized", {
               extensions: {
@@ -523,9 +523,6 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
               });
             }
             try{
-
-
-                    console.log(input.page)
                     const orderslength=(await prisma.order.findMany({where:{userid}})).length
                      const orders=await prisma.order.findMany({where:{userid},include:{location:true},skip:(input.page-1)*6,take:6})
                              
@@ -555,7 +552,7 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
      getadminorders:async ({input}:{input:{page:number}},context : {user:null|string})=>{
               
             const userid=context.user
-            console.log(userid)
+
             if (!userid){
                     throw new GraphQLError("not authorized", {
               extensions: {
@@ -603,7 +600,7 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
           deleteorder:async ({input}:{input:{orderid:string}},context : {user:null|string})=>{
             
             const userid=context.user
-            console.log(userid)
+
             if (!userid){
                     throw new GraphQLError("not authorized", {
               extensions: {
@@ -644,7 +641,7 @@ createorder:async ({input}:{input:createrderinput},context : {user:null|string})
             editorder:async ({input}:{input:{orderid:string,state:string}},context : {user:null|string})=>{
               
             const userid=context.user
-            console.log(userid)
+       
             if (!userid){
                     throw new GraphQLError("not authorized", {
               extensions: {
