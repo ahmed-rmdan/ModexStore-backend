@@ -176,8 +176,8 @@ app.all('/graphql', createHandler({ schema, rootValue: resolver, context:(req:Re
 let io:Server;
 
 const port=process.env.port||3000
-const server=app.listen(port, () => {
-  console.log("Server running on https://modexstore-backend.onrender.com")
+export const server=app.listen(port, () => {
+  
 })
 
 io=new Server(server,{cors:{origin:'*'}})
